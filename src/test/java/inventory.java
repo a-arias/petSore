@@ -3,16 +3,10 @@ import io.restassured.response.Response;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-import static org.testng.AssertJUnit.*;
+import static org.hamcrest.Matchers.equalTo;
 
-public class inventory {
+public class InventoryTest {
 
     @BeforeClass
     public void setup() {
@@ -21,14 +15,18 @@ public class inventory {
 
     @Test(priority = 1)
     public void getInventoryInformation() {
-        given()
+        Response response = given()
                 .when()
-                .get("/store/inventory")  // Include the path parameter in the URL
+                .get("/store/inventory")
                 .then()
                 .statusCode(200)
                 .assertThat()
                 .body("approved", equalTo(50))
-                .body("delivered", equalTo(50));
-    }
+                .body("delivered", equalTo(50))
+                .extract()
+                .response();
 
+        // Log response for debugging
+        System.out.println("Response: " + response.asString());
+    }
 }

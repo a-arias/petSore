@@ -3,16 +3,10 @@ import io.restassured.response.Response;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
-import static org.testng.AssertJUnit.*;
+import static org.hamcrest.Matchers.equalTo;
 
-public class user {
+public class UserTest {
 
     @BeforeClass
     public void setup() {
@@ -21,18 +15,20 @@ public class user {
 
     @Test(priority = 1)
     public void createUserAndValidateResponse() {
-        String userJson = "{\n" +
-                "  \"id\": 101,\n" +
-                "  \"username\": \"theUser\",\n" +
-                "  \"firstName\": \"John\",\n" +
-                "  \"lastName\": \"James\",\n" +
-                "  \"email\": \"john@email.com\",\n" +
-                "  \"password\": \"12345\",\n" +
-                "  \"phone\": \"12345\",\n" +
-                "  \"userStatus\": 1\n" +
-                "}";
+        String userJson = """
+                {
+                    "id": 101,
+                    "username": "theUser",
+                    "firstName": "John",
+                    "lastName": "James",
+                    "email": "john@email.com",
+                    "password": "12345",
+                    "phone": "12345",
+                    "userStatus": 1
+                }
+                """;
 
-        given()
+        Response response = given()
                 .contentType("application/json")
                 .body(userJson)
                 .when()
@@ -42,22 +38,30 @@ public class user {
                 .statusCode(200)
                 .assertThat()
                 .body("id", equalTo(101))
-                .body("username",  equalTo("theUser"))
-                .body("firstName",  equalTo("John"))
-                .body("lastName",  equalTo("James"))
-                .body("email",  equalTo("john@email.com"))
-                .body("password",  equalTo("12345"))
-                .body("phone",  equalTo("12345"))
-                .body("userStatus",  equalTo(1));
+                .body("username", equalTo("theUser"))
+                .body("firstName", equalTo("John"))
+                .body("lastName", equalTo("James"))
+                .body("email", equalTo("john@email.com"))
+                .body("password", equalTo("12345"))
+                .body("phone", equalTo("12345"))
+                .body("userStatus", equalTo(1))
+                .extract().response();
+
+        // Log response for debugging
+        System.out.println("Create User Response: " + response.asString());
     }
 
     @Test(priority = 2)
     public void deleteUserAndValidateResponse() {
-        given()
+        Response response = given()
                 .pathParam("userId", 101)
                 .when()
                 .delete("/user/{userId}")
                 .then()
-                .statusCode(200);  // Validate only the status code
+                .statusCode(200)
+                .extract().response();
+
+        // Log response for debugging
+        System.out.println("Delete User Response: " + response.asString());
     }
 }
